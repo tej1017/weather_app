@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+        <h1 class="text-2xl font-bold text-center mb-4">Weather App</h1>
+        <div class="flex mb-4">
+            <input type="text" id="cityInput" placeholder="Enter city name"
+                class="flex-1 p-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <button id="getWeatherBtn" class="bg-blue-500 text-white p-2 rounded-r-lg hover:bg-blue-600">
+                Get Weather
+            </button>
+        </div>
+        <div id="weatherInfo" class="text-center">
+            <p class="text-gray-500">Enter a city to see the weather</p>
+        </div>
+    </div>
+
+    <script>
+        const apiKey = 'a989225adc1b83a0359a6d0472e6227d'; // Replace with your OpenWeatherMap API key
+        const cityInput = document.getElementById('cityInput');
+        const getWeatherBtn = document.getElementById('getWeatherBtn');
+        const weatherInfo = document.getElementById('weatherInfo');
+
+        getWeatherBtn.addEventListener('click', () => {
+            const city = cityInput.value.trim();
+            if (city) {
+                fetchWeather(city);
+            } else {
+                weatherInfo.innerHTML = '<p class="text-red-500">Please enter a city name</p>';
+            }
+        });
+
+        async function fetchWeather(city) {
+            const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error('City not found');
+                }
+                const data = await response.json();
+                displayWeather(data);
+            } catch (error) {
+                weatherInfo.innerHTML = `<p class="text-red-500">${error.message}</p>`;
+            }
+        }
+
+        function displayWeather(data) {
+            const { name, main, weather, wind } = data;
+            const temp = main.temp;
+            const description = weather[0].description;
+            const humidity = main.humidity;
+            const windSpeed = wind.speed;
+            const icon = `http://openweathermap.org/img/wn/${weather[0].icon}.png`;
+
+            weatherInfo.innerHTML = `
+        <h2 class="text-xl font-semibold">${name}</h2>
+        <img src="${icon}" alt="Weather icon" class="mx-auto">
+        <p class="text-lg">Temperature: ${temp}°C</p>
+        <p class="text-lg">Weather: ${description}</p>
+        <p class="text-lg">Humidity: ${humidity}%</p>
+        <p class="text-lg">Wind Speed: ${windSpeed} m/s</p>
+      `;
+        }
+    </script>
+</body>
+
+</html>
